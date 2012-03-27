@@ -1,0 +1,161 @@
+===============================================================================
+
+		      MGLTOOLS version 1.5.4
+			SOURCE DISTRIBUTION
+
+===============================================================================
+
+Thank you for downloading MGLTools version 1.5.4. 
+
+**************************************************************************
+**  CITING THESE TOOLS IN PUBLICATIONS
+**************************************************************************
+
+Whether you downloaded the Academic or the Commercial distribution, 
+we ask that you acknowledge using these tools in any publications arising
+from their use.
+Under the PMV Help menu there is a citation command providing list of
+papers to be cited for various tools included in this distribution.
+
+	PMV  Help->citations
+
+More license information is available at 
+http://mgltools.scripps.edu/downloads/license-agreements  .
+
+Unless otherwise stated, packages that do not specify a license are released under the MOZILLA Open Source License.
+
+
+
+**************************************************************************
+**  INSTALLATION
+**************************************************************************
+
+    PREREQUISITES
+    -------------
+
+  - Python interpreter version 2.5 (http://www.python.org).
+  - C/C++ compiler (platform dependent packages will need to be compiled on your machine).
+  - SWIG version 1.3.31 or higher (http://www.swig.org)
+  - GLUT library. (http://www.opengl.org/resources/libraries/glut.html)
+  - Tcl and Tk libraries version 8.4 (http://www.tcl.tk/software/tcltk/)
+  - OpenGL version 1.2 or higher is required for using VolumeRendering tools available in VISION and PMV.
+  - GNU C++ (g++) compiler is required for installing QSlimLib package.
+  - For Mac OS X machines, X11(an implementation of the X Window System) is required.
+
+
+DOWNLOADING & INSTALLATION
+--------------------------
+
+The tar file that you downloaded from MGL site is:
+mgltools_source_1.5.4.tar.gz
+
+Note: if your tcl/tk 8.4 libraries are not installed in the default location, 
+you need to set the following environment variables in your .cshrc or .bshrc file:
+
+.cshrc   on LINUX:
+
+   if ( $?LD_LIBRARY_PATH ) then 
+      setenv LD_LIBRARY_PATH 'where libtcl8.4.so and libtk8.4.so are located':${LD_LIBRARY_PATH}
+   else
+      setenv LD_LIBRARY_PATH 'where libtcl8.4.so and libtk8.4.so are located'
+   endif
+
+.cshrc  on MacOS:
+
+  if ( $?DYLD_LIBRARY_PATH ) then
+     setenv DYLD_LIBRARY_PATH 'where libtcl8.4.so and libtk8.4.so are located':${DYLD_LIBRARY_PATH}
+  else
+     setenv DYLD_LIBRARY_PATH 'where libtcl8.4.so and libtk8.4.so are located'
+  endif
+
+.bshrc  on LINUX, SUN or SGI:
+
+  if test -z "$LD_LIBRARY_PATH" then
+     export LD_LIBRARY_PATH="where libtcl8.4.so and libtk8.4.so are located"
+  else
+     export LD_LIBRARY_PATH=" where libtcl8.4.so and libtk8.4.so are located:$LD_LIBRARY_PATH"
+  fi
+
+.bshrc  on MacOS:
+
+  if test -z "$DYLD_LIBRARY_PATH"  then
+     export DYLD_LIBRARY_PATH="where libtcl8.4.so and libtk8.4.so are located"
+  else
+     export DYLD_LIBRARY_PATH="where libtcl8.4.so and libtk8.4.so are located":$DYLD_LIBRARY_PATH
+  fi   
+
+     INSTALLATION STEPS:
+     -------------------
+
+ 1.Run the installation script "startInstallation":
+
+	This script uses the Python interperter available on your machine to install 
+	all the packages.
+	> ./startInstallation -h
+	   prints available options
+
+	> ./startInstallation 
+
+	NOTE: By default MGLTools packages are installed in 
+        sys.exec_prefix/lib/python2.5/site-packages/MGLToolsPckgs. 
+        Other location can be specified during the installation process.
+	The runPmv, runAdt and runVision scripts are installed at user specified location. 
+        Also, during the installation process, the user is asked whether or not 
+        he wants to install numpy. If the user chooses to install numpy, 
+        the script will try to install it in 
+        sys.exec_prefix/lib/python2.5/site-packages. 
+        The user must have write permission to this directory. 
+	
+	The installation script will try to install ./sitecustomize.py to
+	sys.prefix/lib/python2.5 . If the installation fails 
+        due to inadequate permissions, make sure to copy this file  manually 
+        to sys.prefix/lib/python2.5.
+
+	The user has to install Python Imaging Library (PIL) located in THIRDPARTY
+        directory manually. Follow the installation instructions in 
+        ./THIRDPARTY/Imaging-1.1.5/README file.
+
+
+
+ 2. Start ADT, PMV or VISION:
+	
+	- either change directory to the scripts installation directory and type:
+	    > runPmv    
+	  
+	 - or create aliases in your .cshrc or .bashr  as in the following examples:
+	   .cshrc:
+
+     	    alias runPmv ScriptsInstDir/runPmv	
+            alias runAdt ScriptsInstDir/runAdt
+            alias runVision ScriptsInstDir/runVision
+
+           .bashrc:
+
+           alias runPmv='ScriptsInstDir/runPmv'
+           alias runAdt='ScriptsInstDir/runAdt'
+           alias runVision='ScriptsInstDir/runVision'
+	
+
+DOCUMENTATION
+-------------------------
+Documentation,  tutorials and more information are
+available online:
+  http://mgltools.scripps.edu/documentation
+
+
+HOW TO CONTACT US:
+------------------
+ The following mailing lists are available for users to communicate with other MGLTools
+ users and MGLTools developers(http://mgldev.scripps.edu/mailman/listinfo):
+
+ -autodock: a community of AutoDock, AutoGrid and AutoDockTools (ADT) users with lots of experience to share(http://mgldev.scripps.edu/mailman/listinfo/autodock);
+ -pmv(http://mgldev.scripps.edu/mailman/listinfo/pmv)for questions regarding the use of PMV;
+ -vision(http://mgldev.scripps.edu/mailman/listinfo/vision)for questions regarding the use 
+of VISION
+ -MGLTools support(http://mgldev.scripps.edu/mailman/listinfo/mglsupport)for questions regarding installing the MGLTools
+Please visit our Frequently Asked Questions page 
+(http://mgltools.scripps.edu/documentation/faq) if you have any problems installing or 
+running our tools. 
+If your problem is not listed, send an email to mgltools (mgltools@scripps.edu)
+  
+

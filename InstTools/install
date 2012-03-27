@@ -1,0 +1,412 @@
+#!/usr/bin/env python2.5
+#
+##
+## Author: Michel F. Sanner, Sophie Coon ,Sowjanya Karnati
+## Date: October 2004
+## CopyRight: Michel F.SANNER and TSRI
+##
+##
+"""
+-This script is for installing MGLPACKS, THIRDPARTY(eg. Pmw, numpy)
+
+
+-By Default: 
+    the MGLTools packages will be installed in
+                sys.exec_prefix/lib/python2.5/site-packages/MGLToolsPckg
+  The user is asked for an optional installation directory.
+- During the installation process, the user is asked whether or not he wants
+  to install numpy. 
+  If the user chooses to install numpy, it will be installed in  
+  sys.exec_prefix/lib/python2.5/site-packages. If the user does not
+  have write permission, numeric will be installed at the location specified 
+  above.
+
+
+- Options List:
+    -q, --quiet    run installation in a quite mode: without asking questions
+    --instDir      location for installation of platform-dependent packages
+    --scriptsDir   location for installation of scripts like pmv, vision, adt
+
+"""
+import os, re, sys, string
+from os import path
+import warnings
+import tarfile
+from optparse import OptionParser
+from distutils import sysconfig
+try:
+    import readline
+except:
+    pass
+
+cwd = os.getcwd()
+######################################################################
+### HELPER FUNCTIONS
+######################################################################
+def getYesNo(msg, question):
+    print "\n ================================================================"
+    if msg:
+        print msg
+    ans = raw_input(question + " [y]es/[n]no ? : ")
+    if ans=='':
+        ans = 'Y'
+    while ans[0] not in ['y', 'Y', 'n', 'N']:
+        ans = raw_input("Please enter yes or no: ")
+    return ans[0] in ['y', 'Y']
+
+
+##########################################################################
+#   CREATE THE OPTIONS LIST
+##########################################################################
+share = sys.prefix
+dep = sys.exec_prefix
+confVars = sysconfig.get_config_vars()
+pyexec = sys.executable
+pyVersion = sys.version[:3]
+
+if float(pyVersion) < 2.5:
+    sys.exit("ERROR: Python version 2.5 or higher is required. Python version %sis currently"%pyVersion)
+
+
+# default MGLTools packages installation location
+packsLoc = depLoc = os.path.join(dep, 'lib/python%s/site-packages'%pyVersion)
+
+
+scriptsLoc = packsLoc
+
+# try to install numpy at:
+NumericLoc = os.path.join(dep, 'lib/python%s/site-packages'%pyVersion)
+
+# default Pmw inst. location
+shareLoc = os.path.join(share, 'lib/python%s/site-packages'%pyVersion)
+
+parser = OptionParser()
+
+# Verbose option to prompt the user at the command line.
+parser.add_option("-q", "--quiet",
+                  action="store_true", dest="quiet",
+                  default=False, help="option to run the installation in a quiet mode.")
+
+# packsLoc allows the user to specify where to install MGLTools packages.
+parser.add_option("--instDir", dest="packsLoc", default=packsLoc,
+                  help="option to specify the installation location of the platform dependent python packages")
+
+
+##########################################################################
+#   INSTALLATION
+##########################################################################
+print ""
+print "Installation of the source distribution MGLTools"
+print "---------------------------------------------------------------"
+print "REQUIREMENTS:"
+print "\t- Python interpreter version 2.5"
+print "\t- C/C++ compiler"
+print "\t- SWIG version 1.3.31"
+print "\t- Tcl/Tk 8.4"
+print "---------------------------------------------------------------"
+# get the options...
+(options, args) = parser.parse_args()
+
+packsLoc = options.packsLoc
+# installation location    
+msg = """MGLTools packages will be installed in: \n%s"""%packsLoc
+if not options.quiet:
+    ans = getYesNo(msg, "Would you like to specify another location?")
+    if ans :
+        packsLoc = raw_input("Enter new location:")
+    if path.exists(packsLoc):
+        if not os.access(packsLoc, os.W_OK):
+            packsLoc = raw_input("%s directory has no write access.\nPlease enter new location:" % packsLoc)
+else:
+    print msg
+
+            
+# scripts installation location          
+scriptsLoc = packsLoc
+
+msg = """The runPmv, runAdt and runVision scripts will be installed in:\n %s"""%scriptsLoc
+if not options.quiet:
+    ans = getYesNo(msg, "Would you like to specify another location?")
+    if ans :
+        scriptsLoc = raw_input("Enter new location:")
+    if path.exists(scriptsLoc):
+        if not os.access(scriptsLoc, os.W_OK):
+            scriptsLoc = raw_input("%s directory has no write access.\nPlease enter new location:" % scriptsLoc)
+	   
+else:
+    print msg
+
+packsLoc = path.abspath(packsLoc)
+mglroot = packsLoc
+
+scriptsLoc = path.abspath(scriptsLoc)
+
+if not path.exists(packsLoc):
+    os.mkdir(packsLoc)
+    
+#insatlling numpy in local python site-packages
+
+cwd =os.getcwd()
+TPFiles = os.listdir('./THIRDPARTY')
+TPFiles = filter(lambda x: x.endswith('tar.gz'), TPFiles)
+uninstlist=[]
+logfiles = []
+numericMsg = None
+try:
+    import numpy
+    needNumpy = False
+except:
+    needNumpy = True
+
+if needNumpy:
+    ans = getYesNo(None, "NUMPY is required to build/run MGLTools.\nWould you like to install NUMPY in %s?" % NumericLoc)
+    if ans:
+        TPFiles = os.listdir('./THIRDPARTY')
+        TPFiles = filter(lambda x: x.endswith('tar.gz'), TPFiles)
+        os.chdir('./THIRDPARTY')
+        for tFile in TPFiles:
+            if tFile.startswith('numpy'): 
+                #print os.path.splitext(tFile)
+                #dirName = os.path.splitext(os.path.splitext(tFile)[0])[0]
+                allfiles = os.listdir(".")
+                dirName = None
+                for file in allfiles:
+                    if file.startswith("numpy") and os.path.isdir(file):
+                        dirName = file
+
+                if not dirName:
+                    # uncompress the tarFile
+                    tf = tarfile.open(tFile, 'r:gz')
+                    for tfinfo in tf:
+                        tf.extract(tfinfo)
+                    tf.close()
+                    allfiles = os.listdir(".")
+                    for file in allfiles:
+                        if file.startswith("numpy") and os.path.isdir(file):
+                            dirName = file
+                #print dirName
+                os.chdir(dirName)
+                #print "write acces is, ", os.access(NumericLoc, os.W_OK)
+                if os.access(NumericLoc, os.W_OK):
+                    cmd = '%s setup.py install  --install-platlib=%s --install-scripts=%s'%(pyexec, NumericLoc, NumericLoc)
+                    status = os.system(cmd)
+                    if status != 0:
+                        print "Error in numpy installation to %s directory" % NumericLoc
+                else:
+                    numericMsg = "NUMPY CANNOT BE INSTALLED IN %s (no write access).\n" % (NumericLoc,)
+                    print numericMsg
+                    if not path.samefile(NumericLoc, packsLoc):
+                        NumericLoc = path.join(packsLoc, "MGLToolsPckgs")
+                        ans = getYesNo(None, "Do you wish to install numpy in %s?" % NumericLoc)
+                        if ans:
+                            cmd = '%s setup.py install --install-platlib=%s --install-scripts=%s'%(pyexec, NumericLoc, NumericLoc)
+                            status = os.system(cmd)
+                            if not status == 0:
+                                print "numpy is not installed in %s"%NumericLoc
+                            else:
+                                #add location of numpy to the PYTHONPATH environment variable
+                                os.putenv("PYTHONPATH", NumericLoc)
+
+os.chdir(cwd)
+
+from popen2 import Popen4
+
+# 1- Untar and install the DIST MGLPACKS
+
+
+
+packsLoc = path.join(packsLoc, "MGLToolsPckgs")
+    
+print "\n ================================================================"
+print "Installing MGLTools packages  to %s" % packsLoc
+
+tarFiles = os.listdir('./MGLPACKS')
+tarFiles = filter(lambda x: x.endswith('tar.gz'), tarFiles)
+os.chdir('./MGLPACKS')
+
+for tFile in tarFiles:
+    
+    dirName = os.path.splitext(os.path.splitext(tFile)[0])[0]
+    if not os.path.exists(dirName):
+        # uncompress the tarFile
+        tf = tarfile.open(tFile, 'r:gz')
+        for tfinfo in tf:
+            tf.extract(tfinfo)
+        tf.close()
+    # cd to tFile
+    os.chdir(dirName)
+    pkgname = string.split(dirName, "-")[0]
+    cmd = '%s setup.py install --install-purelib=%s --install-platlib=%s --install-scripts=%s'%(pyexec, packsLoc, packsLoc, scriptsLoc)
+    print 'installing %s' % (pkgname,)
+    #status = os.system(cmd)
+    output = Popen4(cmd)
+    os.waitpid(output.pid, os.WNOHANG)[1]
+    # create a log file
+    logfile = os.path.join(os.getcwd(),"buildlog.txt")
+    if os.path.isfile(logfile):
+        os.remove(logfile)
+    text = output.fromchild.read()
+    output.fromchild.close()
+    output.tochild.close()
+    
+    f = open(logfile, "w")
+    f.write(text)
+    f.close()
+    status = output.poll()
+    if status != 0 and status != -1:
+        uninstlist.append(pkgname)
+        logfiles.append(logfile)
+        print ("WARNING: Installation of %s FAILED. Please check log file for errors: %s "% (pkgname, logfile))
+	#warnings.warn("Installation of %s FAILED. Please check the log file for errors: %s "% (pkgname, logfile))
+        print " "
+        #continue
+    os.chdir('../')
+    
+os.chdir(cwd)
+
+
+msg = """
+MGLTools require following third party packages to be installed:
+ 
+ - Pmw (Python Mega Widget) version 1.3
+ - PIL (Python Imaging Library), this package cannot be installed automatically.
+   Please see ./THIRDPARTY/Imaging-1.1.5/README file for installation instructions.
+"""
+if not os.access(shareLoc, os.W_OK):
+    shareLoc = packsLoc
+ans = getYesNo(msg, "Do you wish to install Pmw to %s" % shareLoc)
+
+if ans:
+    # Installing 
+    os.chdir('./THIRDPARTY')
+    dirName = None
+    for tFile in TPFiles:
+        # Pmw does not have a setup.py
+        if tFile.startswith('Pmw'):
+            #if not os.path.exists(os.path.join(shareLoc, 'Pmw')):
+            # uncompress the tarFile
+            tf = tarfile.open(tFile, 'r:gz')
+            for tfinfo in tf:
+                tf.extract(tfinfo)
+            tf.close()
+            dirName = os.path.splitext(os.path.splitext(tFile)[0])[0]
+            cmd = '%s setup.py install --install-purelib=%s'%(pyexec, shareLoc)
+            os.chdir(dirName)
+            status = os.system(cmd)
+            if status != 0:
+                print "Error in Pmw installation to %s directory" % shareLoc
+            os.chdir("../")
+            continue
+        
+	# PIL needs to be installed manually
+        if tFile.startswith('Imaging'):
+            tf = tarfile.open(tFile, 'r:gz')
+            for tfinfo in tf:
+                tf.extract(tfinfo)
+            tf.close()
+            continue
+
+
+#create sitecustomize.py
+sitecustomizeMsg = None
+
+os.chdir(cwd)
+f1 = open(os.path.join(packsLoc, "Support", "sitecustomize.py"))
+txt = f1.readlines()
+f1.close()
+instdir = os.path.join(sys.prefix, "lib", "python%s" % pyVersion)
+print "\n ================================================================"
+print "Installing ./sitecustomize.py to %s " % instdir
+f2 = open("sitecustomize.py", "w")
+f2.write("mglroot = '%s'" % mglroot)
+f2.writelines(txt)
+f2.close()
+
+if os.access(instdir, os.W_OK):
+    st = os.system('cp sitecustomize.py %s'%(instdir))
+    if not st ==0:
+        print "CANNOT install ./sitecustomize.py to %s" % instdir
+        sitecustomizeMsg = "PLEASE COPY ./sitecustomize.py to %s." % instdir
+else:
+    print "CANNOT install ./sitecustomize.py to %s (no write access)" % instdir
+    sitecustomizeMsg = "PLEASE COPY ./sitecustomize.py to %s." % instdir  
+
+
+# Make some AutoDockTools files executable:
+if path.exists(os.path.join(packsLoc, 'AutoDockTools/Utilities24')):
+    adtFiles = os.listdir(os.path.join(packsLoc, 'AutoDockTools/Utilities24'))
+
+for adtFile in adtFiles:
+    if adtFile != "__init__.py":
+        f = path.join(packsLoc, 'AutoDockTools/Utilities24', adtFile)
+        if  path.isfile(f):
+            os.chmod(f, 493)
+
+
+# we will not bring the License form up if mslib, stride and UTpackages
+# failed to install
+
+#mslib = path.exists(path.join(packsLoc, "mslib"))
+#ut = path.exists(path.join(packsLoc, "UTpackages"))
+#stride = path.exists(path.join(packsLoc, "stride"))
+mslib = "mslib" in uninstlist
+ut = "UTpackages" in uninstlist
+stride = "stride" in uninstlist
+if mslib and ut and stride:
+    pass
+else:
+    print "\n================================================================"
+    print "Please complete the License Agreement form"
+
+    licensefile = os.path.join(packsLoc, "mglutil", "splashregister", "license.py")
+    sys.path.insert(0, packsLoc)
+    execfile(licensefile)
+
+scriptsMsg = None
+if path.exists(path.join(scriptsLoc, "runPmv")):
+    scriptsMsg = "runPmv, runAdt and runVision scripts are installed at \n    %s.\n    Type runAdt, runPmv or runVision to start any of these applications." % scriptsLoc
+
+if len(uninstlist)==0:
+    print """
+====================================================================
+    Please see ./THIRDPARTY/Imaging-1.1.5/README file for
+    installation instructions of Python Imaging Library (PIL)."""
+
+    if sitecustomizeMsg:
+        print """
+    %s""" % sitecustomizeMsg
+
+    if scriptsMsg:
+        print """
+    %s""" % scriptsMsg
+    print """
+    Please have a look at README file for more information about
+    licenses, tutorials, documentations and mailing lists for the different
+    packages enclosed in this distribution.
+    If you have any problems please visit our FAQ page
+    (http://mgltools.scripps.edu/documentation/faq)
+    or send an e-mail to mgltools@scripps.edu.
+    """ 
+    
+else:
+    print
+    print """
+===================================================================="""
+
+    if scriptsMsg:
+        print """
+    %s""" % scriptsMsg
+    print """
+    The following package(s) are not installed:  %s 
+    Please check log file(s) for errors: """ % (uninstlist, )
+    for logfile in logfiles:
+        print "    ", logfile 
+    
+    if numericMsg:
+        print """
+    %s""" % numericMsg
+
+    if sitecustomizeMsg:
+        print """
+    %s""" % sitecustomizeMsg
+        

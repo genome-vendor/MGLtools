@@ -1,0 +1,34 @@
+#!/bin/sh
+
+######
+## Set some environment variable.
+MGL_ROOT=`pwd`
+export MGL_ROOT
+
+########
+## plaform we run on
+##
+MGL_ARCHOSV=`$MGL_ROOT/InstTools/archosv`
+export MGL_ARCHOSV
+
+#######
+## path to the extralibs directory.
+##
+#MGL_EXTRALIBS="$MGL_ROOT/$MGL_ARCHOSV/extralibs"
+#export MGL_EXTRALIBS
+
+#######
+## path to the extrainclude directory
+MGL_EXTRAINCLUDE="$MGL_ROOT/extrainclude"
+export MGL_EXTRAINCLUDE
+case "`uname -s`" in
+    Darwin*)
+	DISPLAY=":0.0"
+	export DISPLAY
+	;;
+esac
+
+# redirecting the command line argument to
+# the install script.
+InstTools/install $@ 
+
