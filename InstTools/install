@@ -363,7 +363,7 @@ else:
     execfile(licensefile)
 
 scriptsMsg = None
-if path.exists(path.join(scriptsLoc, "runPmv")):
+if os.path.exists(os.path.join(scriptsLoc, "runPmv")):
     scriptsMsg = "runPmv, runAdt and runVision scripts are installed at \n    %s.\n    Type runAdt, runPmv or runVision to start any of these applications." % scriptsLoc
 
 if len(uninstlist)==0:
