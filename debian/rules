@@ -10,6 +10,7 @@ DEB_INST_DIR=${PWD}/${DEB_DIR}/usr/lib/${PKG}
 	dh $@
 
 build:
+	(cd MGLPACKS && tar xzf geomutils-1.5.4.tar.gz) && patch -p0 < debian/patches/MGLPACKS/geomutils-1.5.4/src/geomAlgorithms/objfile.cpp.patch
 	mkdir -p ${DEB_INST_DIR}/usr/lib/python/site-packages
 	mkdir -p ${DEB_INST_DIR}/bin
 	mkdir -p ${DEB_DIR}/usr/bin

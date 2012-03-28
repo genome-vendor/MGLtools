@@ -1,0 +1,9 @@
+--- ./MGLPACKS/geomutils-1.5.4/src/geomAlgorithms/objfile.cpp.orig	2012-03-28 16:04:03.666684000 -0500
++++ ./MGLPACKS/geomutils-1.5.4/src/geomAlgorithms/objfile.cpp	2012-03-28 16:04:17.225561000 -0500
+@@ -1,5 +1,6 @@
+ #include <assert.h>
+ #include <fstream>
++#include <string.h>
+ 
+ #include "objfile.h"
+
