@@ -25,5 +25,5 @@ override_dh_auto_install:
 	done
 	for filename in ${DEB_INST_DIR}/bin/*; do \
 		file=`basename $${filename}`; \
-		echo "export PYTHONPATH=${DEB_INST_DIR}/usr/lib/python:\$$PYTHONPATH; export PATH=/usr/lib/${PKG}/bin:\$$PATH; exec $$file" > ${DEB_DIR}/usr/bin/$${file}${VER}; \
+		echo "export PYTHONPATH=/usr/lib/${PKG}/usr/lib/python/site-packages/MGLToolsPckgs:\$$PYTHONPATH; export PATH=/usr/lib/${PKG}/bin:\$$PATH; exec $$file" > ${DEB_DIR}/usr/bin/$${file}${VER}; \
 	done
