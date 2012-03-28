@@ -1,13 +1,13 @@
 #!/bin/sh
 set -e
 
-PKG="tophat-fusion"
-VER="0.1.0"
+PKG="mgltools"
+VER="1.5.6"
 PKG_DIR=/usr/lib/${PKG}${VER}
 
-if [ \( "$1" = "upgrade" -o "$1" = "remove" \) -a -L /usr/bin/tophat-fusion ]; then
+if [ \( "$1" = "upgrade" -o "$1" = "remove" \) -a -L /usr/bin/runAdt ]; then
     for pathname in ${PKG_DIR}/bin/*; do
         filename=`basename $pathname`
-        update-alternatives --remove ${filename}-fusion /usr/bin/${filename}${VER}
+        update-alternatives --remove ${filename} /usr/bin/${filename}${VER}
     done
 fi

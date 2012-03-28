@@ -2,11 +2,11 @@ Source: mgltools1.5.6
 Section: science
 Priority: optional
 Maintainer: The MGLTools Devlopment Team <mgltools@scripps.edu>
-Build-Depends: debhelper (>= 7), g++, python (>= 2.5)
+Build-Depends: debhelper (>= 7), g++, python, swig, tcl8.4, tcl8.4-dev, tk8.4, tk8.4-dev, python-numpy, mesa-common-dev, python-dev, libglu1-mesa-dev, libxmu-headers, libxmu-dev, libxmu6, libxi-dev, libxi6, python-pmw, python-imaging
 Standards-Version: 3.9.2
 Homepage: http://mgltools.scripps.edu/
 
 Package: mgltools1.5.6
 Architecture: amd64
-Depends: python (>= 2.5)
+Depends: python, swig, tcl8.4, tk8.4, python-numpy, libxmu6, libxi6, python-pmw, python-imaging
 Description: MGLTools is a software developed at the Molecular Graphics Laboratory (MGL) of The Scripps Research Institute for visualization and analysis of molecular structures

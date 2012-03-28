@@ -10,16 +10,20 @@ DEB_INST_DIR=${PWD}/${DEB_DIR}/usr/lib/${PKG}
 	dh $@
 
 build:
-	./configure --prefix=${DEB_INST_DIR}
-	make
-
-override_dh_auto_configure:
+	mkdir -p ${DEB_INST_DIR}/usr/lib/python/site-packages
+	mkdir -p ${DEB_INST_DIR}/bin
+	mkdir -p ${DEB_DIR}/usr/bin
+	python InstTools/install -q --instDir ${DEB_INST_DIR}/usr/lib/python/site-packages
+	
+override_dh_prep:
 	echo ""
 
 override_dh_auto_install:
-	mkdir -p ${DEB_DIR}/usr/bin
-	make install
+	install -m 644 sitecustomize.py ${DEB_INST_DIR}/usr/lib/python/
+	for filename in 'runAdt' 'runPmv' 'runVision'; do \
+	    mv ${DEB_INST_DIR}/usr/lib/python/site-packages/$${filename} ${DEB_INST_DIR}/bin; \
+	done
 	for filename in ${DEB_INST_DIR}/bin/*; do \
 		file=`basename $${filename}`; \
-		echo "export PATH=/usr/lib/${PKG}/bin:\$$PATH; exec $$file" > ${DEB_DIR}/usr/bin/$${file}${VER}; \
+		echo "export PYTHONPATH=${DEB_INST_DIR}/usr/lib/python:\$$PYTHONPATH; export PATH=/usr/lib/${PKG}/bin:\$$PATH; exec $$file" > ${DEB_DIR}/usr/bin/$${file}${VER}; \
 	done
