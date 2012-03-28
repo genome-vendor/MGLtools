@@ -8,5 +8,5 @@ Homepage: http://mgltools.scripps.edu/
 
 Package: mgltools1.5.6
 Architecture: amd64
-Depends: python, swig, tcl8.4, tk8.4, python-numpy, libxmu6, libxi6, python-pmw, python-imaging
+Depends: python, swig, tcl8.4, tk8.4, python-numpy, libxmu6, libxi6, python-pmw, python-imaging, python-imaging-tk, idle-python2.6
 Description: MGLTools is a software developed at the Molecular Graphics Laboratory (MGL) of The Scripps Research Institute for visualization and analysis of molecular structures
